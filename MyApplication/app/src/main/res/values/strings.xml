@@ -1,6 +1,21 @@
 <resources>
-    <string name="app_name">Connect To Web Service</string>
+    <string name="app_name">Account operations</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_qeydiyyat">Registration</string>
+
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="name">Name</string>
+    <string name="title_activity_girish">Login</string>
+    <string name="registration">Registration</string>
+    <string name="login">Login</string>
+    <string name="surname">Surname</string>
+    <string name="graduated_from">Graduated from</string>
+    <string name="graduated_in">Graduated in</string>
+    <string name="born_place">Born place</string>
+    <string name="birthday">Birthday</string>
+    <string name="submit">Submit</string>
+    <string name="clear">Clear</string>
 </resources>
