@@ -1,16 +1,20 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Data;
+using System.Drawing;
+using System.IO;
+using System.ServiceModel;
+using System.ServiceModel.Web;
 
 namespace WebService
 {
     public class Service : IService
     {
-        public string Login(string istiad/*, string sifre*/)
+        public string Login(string istiad, string sifre)
         {
             DataAccess dataAccess = new DataAccess();
 
-            return dataAccess.checkLogin(istiad/*, sifre*/);
+            return dataAccess.checkLogin(istiad, sifre);
         }
 
 
@@ -20,11 +24,11 @@ namespace WebService
 
             public DataAccess()
             {
-                connection = new MySqlConnection("server=localhost;uid=root;password=connection;database=erp");
+                connection = new MySqlConnection("server=45.35.4.29;uid=root;password=connection;database=erp");
             }
 
 
-            public string checkLogin(string istiad/*, string sifre*/)
+            public string checkLogin(string istiad, string sifre)
             {
                 if (connection.State == ConnectionState.Closed)
                     connection.Open();
@@ -37,6 +41,14 @@ namespace WebService
                 else
                     return "0";
             }
+        }
+
+
+        public Stream GetImage ()
+        {
+            FileStream fs = File.OpenRead(@"D:\a.jpg");
+            WebOperationContext.Current.OutgoingResponse.ContentType = "image/jpeg";
+            return fs;
         }
     }
 }
