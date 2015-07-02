@@ -1,11 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
-using System.ServiceModel;
 using System.ServiceModel.Web;
 
 namespace WebService
@@ -22,23 +18,44 @@ namespace WebService
             }*/
 
 
-        public class DataAccess
+        //public class DataAccess
+        //{
+        //    public string checkLogin (string istiad, string sifre)
+        //    {
+        //        if (connection.State == ConnectionState.Closed)
+        //            connection.Open();
+
+        //        MySqlCommand command = new MySqlCommand(" SELECT COUNT(*) FROM users WHERE username='" + istiad + "' ", connection);
+        //        int user_count = Convert.ToInt32(command.ExecuteScalar());
+
+        //        if (user_count == 1)
+        //            return "1";
+        //        else
+        //            return "0";
+        //    }
+        //}
+
+
+        // http://stackoverflow.com/q/472906
+        // http://stackoverflow.com/q/1003275
+        // http://stackoverflow.com/q/10513976
+        public class Convert
         {
-            public string checkLogin (string istiad, string sifre)
+            public static byte[] GetBytes(string str)
             {
-                if (connection.State == ConnectionState.Closed)
-                    connection.Open();
+                byte[] bytes = new byte[str.Length * sizeof(char)];
+                Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
+                return bytes;
+            }
 
-                MySqlCommand command = new MySqlCommand(" SELECT COUNT(*) FROM users WHERE username='" + istiad + "' ", connection);
-                int user_count = Convert.ToInt32(command.ExecuteScalar());
-
-                if (user_count == 1)
-                    return "1";
-                else
-                    return "0";
+            public static string GetString(byte[] bytes)
+            {
+                char[] chars = new char[bytes.Length / sizeof(char)];
+                Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
+                return new string(chars);
             }
         }
-
+        
 
         public Stream GetImage ()
         {
@@ -48,11 +65,13 @@ namespace WebService
         }
 
 
-        public string register (string username, string password, string name, string surname, string graduated_from, string graduated_in, string born_place, string birthday)
+        // https://youtu.be/iqrY9IaUY24
+        // https://youtu.be/AMH4plUP0uo
+        public string register (string username, string password, string name, string surname, string graduated_from, string graduated_in, string born_place, string birthday, string profile_pic)
         {
             bool result = false;
 
-            string query_insert = @"INSERT INTO users(username, password, name, surname) VALUES( ' " + username + " ', ' " + password + " ', ' " + name + " ', ' " + surname + "' );";
+            string query_insert = @"INSERT INTO users(username, password, name, surname, graduated_from, graduated_in, born_place, birthday, profile_pic) VALUES( ' " + username + " ', ' " + password + " ', ' " + name + " ', ' " + surname + " ', ' " + graduated_from + " ', ' " + graduated_in + " ', ' " + born_place + " ', ' " + birthday + " ', '" + profile_pic + " ' );";
 
             if (connection.State == ConnectionState.Closed)
                 connection.Open();
