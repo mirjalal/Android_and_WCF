@@ -8,14 +8,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="tests.com.myapplication.Registration">
 
-    <LinearLayout
-        android:id="@+id/linear"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:orientation="vertical">
-
         <ScrollView
             android:id="@+id/scrollView"
             android:layout_width="fill_parent"
@@ -24,7 +16,8 @@
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:id="@+id/form">
 
                 <EditText
                     android:id="@+id/username"
@@ -38,8 +31,7 @@
                     android:id="@+id/password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/margin_top_bottom"
-                    android:layout_marginTop="@dimen/margin_top_bottom"
+                    android:layout_marginBottom="@dimen/margin_top"
                     android:ems="10"
                     android:hint="@string/password"
                     android:inputType="textPassword" />
@@ -48,8 +40,7 @@
                     android:id="@+id/name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/margin_top_bottom"
-                    android:layout_marginTop="@dimen/margin_top_bottom"
+                    android:layout_marginBottom="@dimen/margin_top"
                     android:ems="10"
                     android:hint="@string/name"
                     android:inputType="text" />
@@ -58,8 +49,7 @@
                     android:id="@+id/surname"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/margin_top_bottom"
-                    android:layout_marginTop="@dimen/margin_top_bottom"
+                    android:layout_marginBottom="@dimen/margin_top"
                     android:ems="10"
                     android:hint="@string/surname"
                     android:inputType="text" />
@@ -68,8 +58,7 @@
                     android:id="@+id/graduated_from"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/margin_top_bottom"
-                    android:layout_marginTop="@dimen/margin_top_bottom"
+                    android:layout_marginBottom="@dimen/margin_top"
                     android:ems="10"
                     android:hint="@string/graduated_from"
                     android:inputType="text" />
@@ -78,8 +67,7 @@
                     android:id="@+id/graduated_in"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/margin_top_bottom"
-                    android:layout_marginTop="@dimen/margin_top_bottom"
+                    android:layout_marginBottom="@dimen/margin_top"
                     android:ems="10"
                     android:hint="@string/graduated_in"
                     android:inputType="text" />
@@ -88,8 +76,7 @@
                     android:id="@+id/born_place"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/margin_top_bottom"
-                    android:layout_marginTop="@dimen/margin_top_bottom"
+                    android:layout_marginBottom="@dimen/margin_top"
                     android:ems="10"
                     android:hint="@string/born_place"
                     android:inputType="date" />
@@ -98,11 +85,11 @@
                     android:id="@+id/birthday"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/margin_top_bottom"
-                    android:layout_marginTop="@dimen/margin_top_bottom"
+                    android:layout_marginBottom="@dimen/margin_top"
                     android:ems="10"
                     android:hint="@string/birthday"
-                    android:inputType="date" />
+                    android:inputType="none"
+                    android:clickable="true" />
 
                 <Button
                     android:layout_width="match_parent"
@@ -124,7 +111,5 @@
             </LinearLayout>
 
         </ScrollView>
-
-    </LinearLayout>
 
 </RelativeLayout>

@@ -28,10 +28,11 @@ public class Main extends ActionBarActivity {
                 switch (v.getId())
                 {
                     case R.id.giris:
-                        startActivity(new Intent(Main.this, Login.class)); // Login activity-sini açýr
+                        startActivity(new Intent(Main.this, Login.class)); // Login activity-sini a??r
                         break;
                     case R.id.qeydiyyat:
-                        startActivity(new Intent(Main.this, Registration.class)); // Registration activity-sini açýr
+                        startActivity(new Intent(Main.this, Registration.class)); // Registration activity-sini a??r
+                        break;
                 }
             }
         };
