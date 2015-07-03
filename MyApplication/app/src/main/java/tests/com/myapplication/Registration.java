@@ -1,20 +1,14 @@
 package tests.com.myapplication;
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Display;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,9 +27,11 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 
 import static android.content.Intent.*;
@@ -50,11 +46,7 @@ public class Registration extends ActionBarActivity {
     TextView profile_pic, birthday;
     EditText username, password, name, surname, graduated_from, graduated_in, born_place;
     ImageView imageview;
-
-    // this is the action code we use in our intent,
-    // this way we know we're looking at the response from our own action
-    private static final int SELECT_PICTURE = 1;
-    private String selectedImagePath;
+    public static String convertedImage = null;
     /***************** local variables ******************/
 
     @Override
@@ -101,11 +93,12 @@ public class Registration extends ActionBarActivity {
                         String bitirdiyi_il = graduated_in.getText().toString();
                         String dogum_yeri = born_place.getText().toString();
                         String dogum_ili = birthday.getText().toString();
+                        String profile_pic = convertedImage;
 
-
+                        // construct URL for async task
+                        String URL = "http://45.35.4.29/wcf/Service.svc/register/" + istiad + "/" + sifre + "/" + ad + "/" + soyad + "/" + bitirdiyi_mekteb + "/" + bitirdiyi_il + "/" + dogum_yeri + "/" + dogum_ili + "/" + profile_pic;
                         // call WebService
-                        String url = "http://45.35.4.29/wcf/Service.svc/register/" + istiad + "/" + sifre + "/" + ad + "/" + soyad;
-                        new HttpAsyncTask().execute(url);
+                        new HttpAsyncTask().execute(URL);
                         break;
                     case R.id.clear:  // "Clear" button
                         ViewGroup group = (ViewGroup) findViewById(R.id.form);
@@ -128,7 +121,7 @@ public class Registration extends ActionBarActivity {
     }
 
 
-    @Override
+//    @Override
 //    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
 //        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
 //
@@ -155,41 +148,279 @@ public class Registration extends ActionBarActivity {
 //        }
 //    }
 
+
+//    public static Bitmap resizeBitMapImage(String filePath, int targetWidth, int targetHeight) {
+//        Bitmap bitMapImage = null;
+//        try {
+//            BitmapFactory.Options options = new BitmapFactory.Options();
+//            options.inJustDecodeBounds = true;
+//            BitmapFactory.decodeFile(filePath, options);
+//            double sampleSize = 0;
+//            Boolean scaleByHeight = Math.abs(options.outHeight - targetHeight) >= Math.abs(options.outWidth
+//                    - targetWidth);
+//            if (options.outHeight * options.outWidth * 2 >= 1638) {
+//                sampleSize = scaleByHeight ? options.outHeight / targetHeight : options.outWidth / targetWidth;
+//                sampleSize = (int) Math.pow(2d, Math.floor(Math.log(sampleSize) / Math.log(2d)));
+//            }
+//            options.inJustDecodeBounds = false;
+//            options.inTempStorage = new byte[128];
+//            while (true) {
+//                try {
+//                    options.inSampleSize = (int) sampleSize;
+//                    bitMapImage = BitmapFactory.decodeFile(filePath, options);
+//                    break;
+//                } catch (Exception ex) {
+//                    try {
+//                        sampleSize = sampleSize * 2;
+//                    } catch (Exception ex1) {
+//
+//                    }
+//                }
+//            }
+//        } catch (Exception ex) {
+//
+//        }
+//       return bitMapImage;
+//    }
+
+
+
+//    public String getRealPathFromURI(Context context, Uri contentUri) {
+//        Cursor cursor = null;
+//        try {
+//            String[] proj = { MediaStore.Images.Media.DATA };
+//            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
+//            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+//            cursor.moveToFirst();
+//            return cursor.getString(column_index);
+//        } finally {
+//            if (cursor != null) {
+//                cursor.close();
+//            }
+//        }
+//    }
+
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
         switch (requestCode) {
             case 0:
                 if (resultCode == RESULT_OK) {
                     Uri selectedImage = imageReturnedIntent.getData();
+//                    File getImageName = new File("" + selectedImage);
 
-                    Bitmap yourSelectedImage = BitmapFactory.decodeFile(selectedImage.getPath());
+//                    Display display = getWindowManager().getDefaultDisplay();
+//                    Point size = new Point();
+//                    display.getSize(size);
+//                    int width = size.x;
+//                    int height = size.y;
 
-                    File getImageName = new File("" + selectedImage);
-                    profile_pic.setText(selectedImage.getPath() + getImageName.getName());
                     imageview.setImageURI(selectedImage);
+                //    birthday.setText(getRealPathFromURI(imageview.getContext(), selectedImage));
+                    InputStream iStream = null;
 
-/******************************* last changes *********************************/
-//                    File pickedImgagePath = new File(ImageName);
-//                    BufferedImage bufferedImage = ImageIO.read(selectedImage.getPath());
+                    try {
+                        iStream = getContentResolver().openInputStream(selectedImage);
+                    } catch (FileNotFoundException e) {
+                        birthday.setText(e.getLocalizedMessage());
+                    }
+                    byte[] inputData = null;
+                    try {
+                        inputData = getBytes(iStream);
+                    } catch (IOException e) {
+                        birthday.setText(e.getLocalizedMessage());
+                    }
 
-                    // get DataBufferBytes from Raster
-//                    WritableRaster raster = bufferedImage .getRaster();
-//                    DataBufferByte data   = (DataBufferByte) raster.getDataBuffer();
-/******************************* last changes *********************************/
-
-                    //yourSelectedImage.recycle();
+                    try {
+                        convertedImage = new String(inputData != null ? inputData : new byte[0], "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        birthday.setText("Couldn't convert from byte[] to string." + e.getMessage());
+                    }
                 }
                 break;
             case 1:
+//                if (resultCode == RESULT_OK) {
+//                    Uri selectedImage = imageReturnedIntent.getData();
+//                    imageview.setImageURI(selectedImage);
+//                }
+//                break;
+
                 if (resultCode == RESULT_OK) {
                     Uri selectedImage = imageReturnedIntent.getData();
+//                    File getImageName = new File("" + selectedImage);
+
+//                    Display display = getWindowManager().getDefaultDisplay();
+//                    Point size = new Point();
+//                    display.getSize(size);
+//                    int width = size.x;
+//                    int height = size.y;
+
                     imageview.setImageURI(selectedImage);
+                    //    birthday.setText(getRealPathFromURI(imageview.getContext(), selectedImage));
+                    InputStream iStream = null;
+
+                    try {
+                        iStream = getContentResolver().openInputStream(selectedImage);
+                    } catch (FileNotFoundException e) {
+                        birthday.setText(e.getLocalizedMessage());
+                    }
+                    byte[] inputData = null;
+                    try {
+                        inputData = getBytes(iStream);
+                    } catch (IOException e) {
+                        birthday.setText(e.getLocalizedMessage());
+                    }
+
+                    try {
+                        convertedImage = new String(inputData != null ? inputData : new byte[0], "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        birthday.setText("Couldn't convert from byte[] to string." + e.getMessage());
+                    }
+                }
+                break;
+            case 2:
+                if (resultCode == RESULT_OK) {
+                    Uri selectedImage = imageReturnedIntent.getData();
+//                    File getImageName = new File("" + selectedImage);
+
+//                    Display display = getWindowManager().getDefaultDisplay();
+//                    Point size = new Point();
+//                    display.getSize(size);
+//                    int width = size.x;
+//                    int height = size.y;
+
+                    imageview.setImageURI(selectedImage);
+                    //    birthday.setText(getRealPathFromURI(imageview.getContext(), selectedImage));
+                    InputStream iStream = null;
+
+                    try {
+                        iStream = getContentResolver().openInputStream(selectedImage);
+                    } catch (FileNotFoundException e) {
+                        birthday.setText(e.getLocalizedMessage());
+                    }
+                    byte[] inputData = null;
+                    try {
+                        inputData = getBytes(iStream);
+                    } catch (IOException e) {
+                        birthday.setText(e.getLocalizedMessage());
+                    }
+
+                    try {
+                        convertedImage = new String(inputData != null ? inputData : new byte[0], "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        birthday.setText("Couldn't convert from byte[] to string." + e.getMessage());
+                    }
+                }
+                break;
+            case 3:
+                if (resultCode == RESULT_OK) {
+                    Uri selectedImage = imageReturnedIntent.getData();
+//                    File getImageName = new File("" + selectedImage);
+
+//                    Display display = getWindowManager().getDefaultDisplay();
+//                    Point size = new Point();
+//                    display.getSize(size);
+//                    int width = size.x;
+//                    int height = size.y;
+
+                    imageview.setImageURI(selectedImage);
+                    //    birthday.setText(getRealPathFromURI(imageview.getContext(), selectedImage));
+                    InputStream iStream = null;
+
+                    try {
+                        iStream = getContentResolver().openInputStream(selectedImage);
+                    } catch (FileNotFoundException e) {
+                        birthday.setText(e.getLocalizedMessage());
+                    }
+                    byte[] inputData = null;
+                    try {
+                        inputData = getBytes(iStream);
+                    } catch (IOException e) {
+                        birthday.setText(e.getLocalizedMessage());
+                    }
+
+                    try {
+                        convertedImage = new String(inputData != null ? inputData : new byte[0], "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        birthday.setText("Couldn't convert from byte[] to string." + e.getMessage());
+                    }
+                }
+                break;
+            case 4:
+                if (resultCode == RESULT_OK) {
+                    Uri selectedImage = imageReturnedIntent.getData();
+//                    File getImageName = new File("" + selectedImage);
+
+//                    Display display = getWindowManager().getDefaultDisplay();
+//                    Point size = new Point();
+//                    display.getSize(size);
+//                    int width = size.x;
+//                    int height = size.y;
+
+                    imageview.setImageURI(selectedImage);
+                    //    birthday.setText(getRealPathFromURI(imageview.getContext(), selectedImage));
+                    InputStream iStream = null;
+
+                    try {
+                        iStream = getContentResolver().openInputStream(selectedImage);
+                    } catch (FileNotFoundException e) {
+                        birthday.setText(e.getLocalizedMessage());
+                    }
+                    byte[] inputData = null;
+                    try {
+                        inputData = getBytes(iStream);
+                    } catch (IOException e) {
+                        birthday.setText(e.getLocalizedMessage());
+                    }
+
+                    try {
+                        convertedImage = new String(inputData != null ? inputData : new byte[0], "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        birthday.setText("Couldn't convert from byte[] to string." + e.getMessage());
+                    }
                 }
                 break;
         }
     }
 
-    /***************** get value from DatePicker & set to EditText ******************/
+
+    public byte[] getBytes(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+
+        int len = 0;
+        while ((len = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, len);
+        }
+        return byteBuffer.toByteArray();
+    }
+
+
+    /***************** get image from anywhere ******************/
+    private void getImage() {
+        Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); // for Camera app
+        Intent getIntent = new Intent(ACTION_GET_CONTENT); // for other image base apps (locations)
+        getIntent.setType("image/*");
+//        Intent pickIntent = new Intent(ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI); // for "Android System" option
+//        pickIntent.setType("image/*");
+        Intent chooserIntent = createChooser(getIntent, "Select Image");
+//        chooserIntent.putExtra("crop", "true");
+//        chooserIntent.putExtra("aspectX", 0);
+//        chooserIntent.putExtra("aspectY", 0);
+//        chooserIntent.putExtra("outputX", 200);
+//        chooserIntent.putExtra("outputY", 150);
+//        chooserIntent.putExtra("scale", true);
+//        chooserIntent.putExtra("return-data", true);
+
+        chooserIntent.putExtra(EXTRA_INITIAL_INTENTS, new Intent[]{takePicture});
+        startActivityForResult(chooserIntent, 0);
+    }
+    /***************** get image from anywhere ******************/
+
+
+    /***************** get value from DatePicker & set to TextView ******************/
     @Override
     protected Dialog onCreateDialog(int id) {
         if (id == 0)
@@ -206,33 +437,18 @@ public class Registration extends ActionBarActivity {
             ay = monthOfYear + 1;
             gun = dayOfMonth;
 
-            birthday.setText(gun + "/" + ay + "/" + il);
+            birthday.setText(gun + "-" + ay + "-" + il);
         }
     };
-    /***************** get value from DatePicker & set to EditText ******************/
+    /***************** get value from DatePicker & set to TextView ******************/
 
 
-
-    /***************** get image from anywhere ******************/
-    private void getImage() {
-        Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); // for Camera app
-        Intent getIntent = new Intent(ACTION_GET_CONTENT); // for other image base apps (locations)
-        getIntent.setType("image/*");
-//        Intent pickIntent = new Intent(ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI); // for "Android System" option
-//        pickIntent.setType("image/*");
-        Intent chooserIntent = createChooser(getIntent, "Select Image");
-        chooserIntent.putExtra(EXTRA_INITIAL_INTENTS, new Intent[]{takePicture});
-        startActivityForResult(chooserIntent, 0);
-    }
-    /***************** get image from anywhere ******************/
-
-
-    public static String GET(String url) {
+    public static String GET(String URL) {
         String result = "";
 
         try {
             HttpClient httpclient = new DefaultHttpClient();
-            HttpGet httpget = new HttpGet(url);
+            HttpGet httpget = new HttpGet(URL);
             HttpResponse response;
             try {
                 response = httpclient.execute(httpget);
@@ -262,6 +478,7 @@ public class Registration extends ActionBarActivity {
         @Override
         protected void onPostExecute(String result) {
             Toast.makeText(getBaseContext(), "Done!", LENGTH_LONG).show();
+            clear.setText(convertedImage);
         }
     }
 

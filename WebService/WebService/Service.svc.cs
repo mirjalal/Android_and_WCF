@@ -41,14 +41,14 @@ namespace WebService
         // http://stackoverflow.com/q/10513976
         public class Convert
         {
-            public static byte[] GetBytes(string str)
+            public static byte[] ConvertToBytes (string str)
             {
                 byte[] bytes = new byte[str.Length * sizeof(char)];
                 Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
                 return bytes;
             }
 
-            public static string GetString(byte[] bytes)
+            public static string ConvertToString (byte[] bytes)
             {
                 char[] chars = new char[bytes.Length / sizeof(char)];
                 Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
@@ -71,7 +71,7 @@ namespace WebService
         {
             bool result = false;
 
-            string query_insert = @"INSERT INTO users(username, password, name, surname, graduated_from, graduated_in, born_place, birthday, profile_pic) VALUES( ' " + username + " ', ' " + password + " ', ' " + name + " ', ' " + surname + " ', ' " + graduated_from + " ', ' " + graduated_in + " ', ' " + born_place + " ', ' " + birthday + " ', '" + profile_pic + " ' );";
+            string query_insert = @"INSERT INTO users(username, password, name, surname, graduated_from, graduated_in, born_place, birthday) VALUES( ' " + username + " ', ' " + password + " ', ' " + name + " ', ' " + surname + " ', ' " + graduated_from + " ', ' " + graduated_in + " ', ' " + born_place + " ', ' " + birthday + " ' , '" + profile_pic + " ' );";
 
             if (connection.State == ConnectionState.Closed)
                 connection.Open();

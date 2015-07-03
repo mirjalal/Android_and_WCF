@@ -19,4 +19,5 @@
     <string name="submit">Submit</string>
     <string name="clear">Clear</string>
     <string name="profile_pic">Pick image</string>
+    <string name="contentDescription">Set profile picture</string>
 </resources>
