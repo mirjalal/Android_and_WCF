@@ -2,12 +2,16 @@ package tests.com.myapplication;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.ClipData;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.ClipboardManager;
 import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,10 +32,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Calendar;
 
 import static android.content.Intent.*;
@@ -46,7 +49,8 @@ public class Registration extends ActionBarActivity {
     TextView profile_pic, birthday;
     EditText username, password, name, surname, graduated_from, graduated_in, born_place;
     ImageView imageview;
-    public static String convertedImage = null;
+    private String convertedImage = null;
+    private byte[] inputData = null;
     /***************** local variables ******************/
 
     @Override
@@ -96,7 +100,7 @@ public class Registration extends ActionBarActivity {
                         String profile_pic = convertedImage;
 
                         // construct URL for async task
-                        String URL = "http://45.35.4.29/wcf/Service.svc/register/" + istiad + "/" + sifre + "/" + ad + "/" + soyad + "/" + bitirdiyi_mekteb + "/" + bitirdiyi_il + "/" + dogum_yeri + "/" + dogum_ili + "/" + profile_pic;
+                        String URL = "http://45.35.4.29/wcf/Service.svc/register/" + istiad + "/" + sifre + "/" + ad + "/" + soyad + "/" + bitirdiyi_mekteb + "/" + bitirdiyi_il + "/" + dogum_yeri + "/" + dogum_ili; //+ "/" + profile_pic;
                         // call WebService
                         new HttpAsyncTask().execute(URL);
                         break;
@@ -149,38 +153,26 @@ public class Registration extends ActionBarActivity {
 //    }
 
 
-//    public static Bitmap resizeBitMapImage(String filePath, int targetWidth, int targetHeight) {
-//        Bitmap bitMapImage = null;
-//        try {
-//            BitmapFactory.Options options = new BitmapFactory.Options();
-//            options.inJustDecodeBounds = true;
-//            BitmapFactory.decodeFile(filePath, options);
-//            double sampleSize = 0;
-//            Boolean scaleByHeight = Math.abs(options.outHeight - targetHeight) >= Math.abs(options.outWidth
-//                    - targetWidth);
-//            if (options.outHeight * options.outWidth * 2 >= 1638) {
-//                sampleSize = scaleByHeight ? options.outHeight / targetHeight : options.outWidth / targetWidth;
-//                sampleSize = (int) Math.pow(2d, Math.floor(Math.log(sampleSize) / Math.log(2d)));
-//            }
-//            options.inJustDecodeBounds = false;
-//            options.inTempStorage = new byte[128];
-//            while (true) {
-//                try {
-//                    options.inSampleSize = (int) sampleSize;
-//                    bitMapImage = BitmapFactory.decodeFile(filePath, options);
-//                    break;
-//                } catch (Exception ex) {
-//                    try {
-//                        sampleSize = sampleSize * 2;
-//                    } catch (Exception ex1) {
+//    public static Bitmap decodeUri(Context c, Uri uri, final int requiredSize)
+//            throws FileNotFoundException {
+//        BitmapFactory.Options o = new BitmapFactory.Options();
+//        o.inJustDecodeBounds = true;
+//        BitmapFactory.decodeStream(c.getContentResolver().openInputStream(uri), null, o);
 //
-//                    }
-//                }
-//            }
-//        } catch (Exception ex) {
+//        int width_tmp = o.outWidth, height_tmp = o.outHeight;
+//        int scale = 1;
 //
+//        while (true) {
+//            if (width_tmp / 2 < requiredSize || height_tmp / 2 < requiredSize)
+//                break;
+//            width_tmp /= 2;
+//            height_tmp /= 2;
+//            scale *= 2;
 //        }
-//       return bitMapImage;
+//
+//        BitmapFactory.Options o2 = new BitmapFactory.Options();
+//        o2.inSampleSize = scale;
+//        return BitmapFactory.decodeStream(c.getContentResolver().openInputStream(uri), null, o2);
 //    }
 
 
@@ -204,184 +196,96 @@ public class Registration extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+
         switch (requestCode) {
             case 0:
                 if (resultCode == RESULT_OK) {
                     Uri selectedImage = imageReturnedIntent.getData();
-//                    File getImageName = new File("" + selectedImage);
-
-//                    Display display = getWindowManager().getDefaultDisplay();
-//                    Point size = new Point();
-//                    display.getSize(size);
-//                    int width = size.x;
-//                    int height = size.y;
 
                     imageview.setImageURI(selectedImage);
-                //    birthday.setText(getRealPathFromURI(imageview.getContext(), selectedImage));
-                    InputStream iStream = null;
 
-                    try {
-                        iStream = getContentResolver().openInputStream(selectedImage);
-                    } catch (FileNotFoundException e) {
-                        birthday.setText(e.getLocalizedMessage());
-                    }
-                    byte[] inputData = null;
-                    try {
-                        inputData = getBytes(iStream);
-                    } catch (IOException e) {
-                        birthday.setText(e.getLocalizedMessage());
-                    }
+/************************************ get real path ****************/
+//                    birthday.setText(getRealPathFromURI(imageview.getContext(), selectedImage));
+/************************************ get real path ****************/
 
-                    try {
-                        convertedImage = new String(inputData != null ? inputData : new byte[0], "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        birthday.setText("Couldn't convert from byte[] to string." + e.getMessage());
-                    }
+//                    InputStream iStream = null;
+//
+//                    try {
+//                        iStream = getContentResolver().openInputStream(selectedImage);
+//                    } catch (FileNotFoundException e) {
+//                        birthday.setText(e.getLocalizedMessage());
+//                    }
+//
+//                    try {
+//                        inputData = getBytes(iStream);
+//                    } catch (IOException e) {
+//                        birthday.setText(e.getLocalizedMessage());
+//                    }
+
+//                    try {
+//                        convertedImage = new String(inputData, "UTF-8");
+//                    } catch (UnsupportedEncodingException e) {
+//                        birthday.setText(e.getLocalizedMessage());
+//                    }
+//                    assert data != null;
+//                    convertedImage = Base64.encodeToString(data, 0).replace('/', '-');
+//                    birthday.setText(convertedImage);
+
+                    Bitmap bitmap = ((BitmapDrawable) imageview.getDrawable()).getBitmap();
+                    convertedImage = Base64.encodeToString(getBytesFromBitmap(bitmap), Base64.DEFAULT);
+                 //   birthday.setText(Arrays.toString(getBytesFromBitmap(bitmap)));
                 }
                 break;
-            case 1:
+//            case 1:
+////                if (resultCode == RESULT_OK) {
+////                    Uri selectedImage = imageReturnedIntent.getData();
+////                    imageview.setImageURI(selectedImage);
+////                }
+////                break;
+//
 //                if (resultCode == RESULT_OK) {
 //                    Uri selectedImage = imageReturnedIntent.getData();
+////                    File getImageName = new File("" + selectedImage);
+//
+////                    Display display = getWindowManager().getDefaultDisplay();
+////                    Point size = new Point();
+////                    display.getSize(size);
+////                    int width = size.x;
+////                    int height = size.y;
+//
 //                    imageview.setImageURI(selectedImage);
+//                    //    birthday.setText(getRealPathFromURI(imageview.getContext(), selectedImage));
+//                    InputStream iStream = null;
+//
+//                    try {
+//                        iStream = getContentResolver().openInputStream(selectedImage);
+//                    } catch (FileNotFoundException e) {
+//                        birthday.setText(e.getLocalizedMessage());
+//                    }
+//
+//                    byte[] inputData = null;
+//                    try {
+//                        inputData = getBytes(iStream);
+//                    } catch (IOException e) {
+//                        birthday.setText(e.getLocalizedMessage());
+//                    }
+//
+//                    try {
+//                        convertedImage = new String(inputData != null ? inputData : new byte[0], "UTF-8");
+//                    } catch (UnsupportedEncodingException e) {
+//                        birthday.setText("Couldn't convert from byte[] to string." + e.getMessage());
+//                    }
 //                }
 //                break;
-
-                if (resultCode == RESULT_OK) {
-                    Uri selectedImage = imageReturnedIntent.getData();
-//                    File getImageName = new File("" + selectedImage);
-
-//                    Display display = getWindowManager().getDefaultDisplay();
-//                    Point size = new Point();
-//                    display.getSize(size);
-//                    int width = size.x;
-//                    int height = size.y;
-
-                    imageview.setImageURI(selectedImage);
-                    //    birthday.setText(getRealPathFromURI(imageview.getContext(), selectedImage));
-                    InputStream iStream = null;
-
-                    try {
-                        iStream = getContentResolver().openInputStream(selectedImage);
-                    } catch (FileNotFoundException e) {
-                        birthday.setText(e.getLocalizedMessage());
-                    }
-                    byte[] inputData = null;
-                    try {
-                        inputData = getBytes(iStream);
-                    } catch (IOException e) {
-                        birthday.setText(e.getLocalizedMessage());
-                    }
-
-                    try {
-                        convertedImage = new String(inputData != null ? inputData : new byte[0], "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        birthday.setText("Couldn't convert from byte[] to string." + e.getMessage());
-                    }
-                }
-                break;
-            case 2:
-                if (resultCode == RESULT_OK) {
-                    Uri selectedImage = imageReturnedIntent.getData();
-//                    File getImageName = new File("" + selectedImage);
-
-//                    Display display = getWindowManager().getDefaultDisplay();
-//                    Point size = new Point();
-//                    display.getSize(size);
-//                    int width = size.x;
-//                    int height = size.y;
-
-                    imageview.setImageURI(selectedImage);
-                    //    birthday.setText(getRealPathFromURI(imageview.getContext(), selectedImage));
-                    InputStream iStream = null;
-
-                    try {
-                        iStream = getContentResolver().openInputStream(selectedImage);
-                    } catch (FileNotFoundException e) {
-                        birthday.setText(e.getLocalizedMessage());
-                    }
-                    byte[] inputData = null;
-                    try {
-                        inputData = getBytes(iStream);
-                    } catch (IOException e) {
-                        birthday.setText(e.getLocalizedMessage());
-                    }
-
-                    try {
-                        convertedImage = new String(inputData != null ? inputData : new byte[0], "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        birthday.setText("Couldn't convert from byte[] to string." + e.getMessage());
-                    }
-                }
-                break;
-            case 3:
-                if (resultCode == RESULT_OK) {
-                    Uri selectedImage = imageReturnedIntent.getData();
-//                    File getImageName = new File("" + selectedImage);
-
-//                    Display display = getWindowManager().getDefaultDisplay();
-//                    Point size = new Point();
-//                    display.getSize(size);
-//                    int width = size.x;
-//                    int height = size.y;
-
-                    imageview.setImageURI(selectedImage);
-                    //    birthday.setText(getRealPathFromURI(imageview.getContext(), selectedImage));
-                    InputStream iStream = null;
-
-                    try {
-                        iStream = getContentResolver().openInputStream(selectedImage);
-                    } catch (FileNotFoundException e) {
-                        birthday.setText(e.getLocalizedMessage());
-                    }
-                    byte[] inputData = null;
-                    try {
-                        inputData = getBytes(iStream);
-                    } catch (IOException e) {
-                        birthday.setText(e.getLocalizedMessage());
-                    }
-
-                    try {
-                        convertedImage = new String(inputData != null ? inputData : new byte[0], "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        birthday.setText("Couldn't convert from byte[] to string." + e.getMessage());
-                    }
-                }
-                break;
-            case 4:
-                if (resultCode == RESULT_OK) {
-                    Uri selectedImage = imageReturnedIntent.getData();
-//                    File getImageName = new File("" + selectedImage);
-
-//                    Display display = getWindowManager().getDefaultDisplay();
-//                    Point size = new Point();
-//                    display.getSize(size);
-//                    int width = size.x;
-//                    int height = size.y;
-
-                    imageview.setImageURI(selectedImage);
-                    //    birthday.setText(getRealPathFromURI(imageview.getContext(), selectedImage));
-                    InputStream iStream = null;
-
-                    try {
-                        iStream = getContentResolver().openInputStream(selectedImage);
-                    } catch (FileNotFoundException e) {
-                        birthday.setText(e.getLocalizedMessage());
-                    }
-                    byte[] inputData = null;
-                    try {
-                        inputData = getBytes(iStream);
-                    } catch (IOException e) {
-                        birthday.setText(e.getLocalizedMessage());
-                    }
-
-                    try {
-                        convertedImage = new String(inputData != null ? inputData : new byte[0], "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        birthday.setText("Couldn't convert from byte[] to string." + e.getMessage());
-                    }
-                }
-                break;
         }
+    }
+
+
+    // convert from bitmap to byte array
+    public byte[] getBytesFromBitmap(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
+        return stream.toByteArray();
     }
 
 
@@ -428,7 +332,6 @@ public class Registration extends ActionBarActivity {
 
         return null;
     }
-
 
     private DatePickerDialog.OnDateSetListener datepickerlistener = new DatePickerDialog.OnDateSetListener() {
         @Override
@@ -478,7 +381,6 @@ public class Registration extends ActionBarActivity {
         @Override
         protected void onPostExecute(String result) {
             Toast.makeText(getBaseContext(), "Done!", LENGTH_LONG).show();
-            clear.setText(convertedImage);
         }
     }
 
