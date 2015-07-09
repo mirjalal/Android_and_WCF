@@ -37,7 +37,7 @@ namespace WebService
         //}
 
 
-        public Stream GetImage()
+        public Stream GetImage ()
         {
             FileStream fs = File.OpenRead(@"D:\a.jpg");
             WebOperationContext.Current.OutgoingResponse.ContentType = "image/jpeg";
@@ -47,13 +47,13 @@ namespace WebService
 
         // https://youtu.be/iqrY9IaUY24
         // https://youtu.be/AMH4plUP0uo
-        public string register(string username, string password, string name, string surname, string graduated_from, string graduated_in, string born_place, string birthday, string profile_pic)
+        public string register (string username, string password, string name, string surname, string graduated_from, string graduated_in, string born_place, string birthday, string profile_pic)
         {
             bool result = false;
 
             string query_insert = @"INSERT INTO users(username, password, name, surname, graduated_from, graduated_in, born_place, birthday, profile_pic) VALUES( ' " + username + " ', ' " + password + " ', ' " + name + " ', ' " + surname + " ', ' " + graduated_from + " ', ' " + graduated_in + " ', ' " + born_place + " ', ' " + birthday + " ', '" + profile_pic + " ' );";
 
-            if (connection.State == ConnectionState.Broken || connection.State == ConnectionState.Closed)
+            if (connection.State == ConnectionState.Closed)
                 connection.Open();
 
             using (MySqlCommand insert = new MySqlCommand(query_insert, connection))
@@ -62,6 +62,8 @@ namespace WebService
                 result = true;
             }
 
+            connection.Close();
+
             if (result)
                 return "success";
             else
@@ -69,25 +71,27 @@ namespace WebService
         }
 
 
-		// https://goo.gl/PXc6Z4
-		// http://stackoverflow.com/q/29414960
-		// http://stackoverflow.com/q/8270464
-		// http://stackoverflow.com/q/2108297
-        public List<UserDetails> login(string username, string password)
+        // https://goo.gl/PXc6Z4
+        // http://stackoverflow.com/q/29414960
+        // http://stackoverflow.com/q/8270464
+        // http://stackoverflow.com/q/2108297
+        public List<UserDetails> login (string username, string password)
         {
-            object _id = 0;
+            int _id = 0;
             List<UserDetails> details = new List<UserDetails>();
 
-            if (connection.State == ConnectionState.Broken || connection.State == ConnectionState.Closed)
+            if (connection.State == ConnectionState.Closed)
                 connection.Open();
 
             using (MySqlCommand search = new MySqlCommand("SELECT _id FROM users WHERE username = ' " + username + " ' AND password = ' " + password + " ' ", connection))
             {
-                _id = search.ExecuteScalar();
+                _id = Convert.ToInt32(search.ExecuteScalar());
             }
 
+            connection.Close();
+            connection.Open();
 
-            if (Convert.ToInt32(_id) != 0)
+            if (_id != 0)
             {
                 using (MySqlCommand data = new MySqlCommand("SELECT name, surname, graduated_from, graduated_in, born_place, birthday FROM users WHERE _id = " + _id + ";", connection))
                 {
@@ -95,8 +99,10 @@ namespace WebService
 
                     while (get_data.Read())
                     {
-                        details.Add(new UserDetails (get_data.GetString(0), get_data.GetString(1), get_data.GetString(2), get_data.GetString(3), get_data.GetString(4)));
+                        details.Add(new UserDetails(get_data.GetString(0), get_data.GetString(1), get_data.GetString(2), get_data.GetString(3), get_data.GetString(4), get_data.GetString(5)));
                     }
+
+                    get_data.Close();
 
                     // Serialize the results as JSON
                     DataContractJsonSerializer serializer = new DataContractJsonSerializer(details.GetType());
@@ -112,9 +118,5 @@ namespace WebService
             else
                 return details;
         }
-
-
-
-
     }
 }

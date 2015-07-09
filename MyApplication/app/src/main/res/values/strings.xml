@@ -20,4 +20,6 @@
     <string name="clear">Clear</string>
     <string name="profile_pic">Pick image</string>
     <string name="contentDescription">Set profile picture</string>
+    <string name="title_activity_profile">Profile</string>
+    <string name="update">Update</string>
 </resources>

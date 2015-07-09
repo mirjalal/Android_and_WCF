@@ -59,7 +59,7 @@ public class Registration extends ActionBarActivity {
         setContentView(R.layout.activity_registration);
 
 
-        /***************** get values from view elements ******************/
+        /***************** find view elements ******************/
         submit = (Button) findViewById(R.id.submit);
         clear = (Button) findViewById(R.id.clear);
         username = (EditText) findViewById(R.id.username);
@@ -72,7 +72,7 @@ public class Registration extends ActionBarActivity {
         birthday = (TextView) findViewById(R.id.birthday);
         profile_pic = (TextView) findViewById(R.id.profile_pic);
         imageview = (ImageView) findViewById(R.id.imageView);
-        /***************** get values from view elements ******************/
+        /***************** find view elements ******************/
 
 
         /***************** set calendar to current date ******************/

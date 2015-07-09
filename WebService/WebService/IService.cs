@@ -21,7 +21,7 @@ namespace WebService
 
         // http://stackoverflow.com/a/2089974/4057688
         [OperationContract]
-        [WebInvoke(Method = "GET", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json, UriTemplate = "login/{username}/{password}", BodyStyle = WebMessageBodyStyle.Bare)]
+        [WebInvoke(Method = "GET", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json, UriTemplate = "login/{username}/{password}", BodyStyle=WebMessageBodyStyle.WrappedResponse)]
         List<UserDetails> login(string username, string password);
     }
 
@@ -29,26 +29,54 @@ namespace WebService
     public class UserDetails
     {
         [DataMember]
-        public string name { get; set; }
+        public string name
+        {
+            get;
+            set;
+        }
 
         [DataMember]
-        public string surname { get; set; }
+        public string surname
+        {
+            get;
+            set;
+        }
 
         [DataMember]
-        public string graduated_from { get; set; }
+        public string graduated_from
+        {
+            get;
+            set;
+        }
 
         [DataMember]
-        public string born_place { get; set; }
+        public string graduated_in
+        {
+            get;
+            set;
+        }
 
         [DataMember]
-        public string birthday { get; set; }
+        public string born_place
+        {
+            get;
+            set;
+        }
+
+        [DataMember]
+        public string birthday
+        {
+            get;
+            set;
+        }
 
 
-        public UserDetails(string name, string surname, string graduated_from, string born_place, string birthday)
+        public UserDetails (string name, string surname, string graduated_from, string graduated_in, string born_place, string birthday)
         {
             this.name = name;
             this.surname = surname;
             this.graduated_from = graduated_from;
+            this.graduated_in = graduated_in;
             this.born_place = born_place;
             this.birthday = birthday;
         }
