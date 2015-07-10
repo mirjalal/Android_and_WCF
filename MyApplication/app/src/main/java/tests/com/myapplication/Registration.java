@@ -2,7 +2,6 @@ package tests.com.myapplication;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.ClipData;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -11,7 +10,6 @@ import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.text.ClipboardManager;
 import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,7 +32,6 @@ import org.apache.http.util.EntityUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Calendar;
 
 import static android.content.Intent.*;
@@ -49,6 +46,7 @@ public class Registration extends ActionBarActivity {
     TextView profile_pic, birthday;
     EditText username, password, name, surname, graduated_from, graduated_in, born_place;
     ImageView imageview;
+    String URL;
     private String convertedImage = null;
     private byte[] inputData = null;
     /***************** local variables ******************/
@@ -100,7 +98,7 @@ public class Registration extends ActionBarActivity {
                         String profile_pic = convertedImage;
 
                         // construct URL for async task
-                        String URL = "http://45.35.4.29/wcf/Service.svc/register/" + istiad + "/" + sifre + "/" + ad + "/" + soyad + "/" + bitirdiyi_mekteb + "/" + bitirdiyi_il + "/" + dogum_yeri + "/" + dogum_ili; //+ "/" + profile_pic;
+                        URL = "http://45.35.4.29/wcf/Service.svc/register/" + istiad.trim() + "/" + sifre.trim() + "/" + ad.trim() + "/" + soyad.trim() + "/" + bitirdiyi_mekteb.trim() + "/" + bitirdiyi_il.trim() + "/" + dogum_yeri.trim() + "/" + dogum_ili.trim(); //+ "/" + profile_pic;
                         // call WebService
                         new HttpAsyncTask().execute(URL);
                         break;
@@ -123,35 +121,6 @@ public class Registration extends ActionBarActivity {
         birthday.setOnClickListener(button_click);
         profile_pic.setOnClickListener(button_click);
     }
-
-
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
-//        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
-//
-//        switch (requestCode) {
-//            case 3:
-//                if (resultCode == RESULT_OK) {
-//                    Uri selectedImage = imageReturnedIntent.getData();
-//                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
-//
-//                    Cursor cursor = getContentResolver().query(
-//                            selectedImage, filePathColumn, null, null, null);
-//                    cursor.moveToFirst();
-//
-//                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-//                    String filePath = cursor.getString(columnIndex);
-//                    cursor.close();
-//
-//
-//                    Bitmap yourSelectedImage = BitmapFactory.decodeFile(filePath);
-//                    File getImageName = new File("" + selectedImage);
-//
-//                    profile_pic.setText("Choice image: " + getImageName.getName());
-//                }
-//        }
-//    }
-
 
 //    public static Bitmap decodeUri(Context c, Uri uri, final int requiredSize)
 //            throws FileNotFoundException {
@@ -346,35 +315,38 @@ public class Registration extends ActionBarActivity {
     /***************** get value from DatePicker & set to TextView ******************/
 
 
-    public static String GET(String URL) {
-        String result = "";
-
-        try {
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpGet httpget = new HttpGet(URL);
-            HttpResponse response;
-            try {
-                response = httpclient.execute(httpget);
-                HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    return EntityUtils.toString(entity);
-                }
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        } catch (Exception e) {
-            result = e.getLocalizedMessage();
-        }
-
-        return result;
-    }
+//    public static String GET(String URL) {
+//
+//    }
 
 
     private class HttpAsyncTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... urls) {
-            return GET(urls[0]);
+            String result = "";
+
+            try {
+                HttpClient httpclient = new DefaultHttpClient();
+                HttpGet httpget = new HttpGet(urls[0]);
+                HttpResponse response;
+                try {
+                    response = httpclient.execute(httpget);
+                    HttpEntity entity = response.getEntity();
+                    if (entity != null) {
+                        return EntityUtils.toString(entity);
+                    }
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+            } catch (Exception e) {
+                result = e.getLocalizedMessage();
+            }
+
+            return result;
+
+           // return GET(urls[0]);
         }
 
         // onPostExecute displays the results of the AsyncTask.

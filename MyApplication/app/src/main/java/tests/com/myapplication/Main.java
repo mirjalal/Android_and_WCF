@@ -18,15 +18,13 @@ public class Main extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        giris     = (Button) findViewById(R.id.giris);
+        giris = (Button) findViewById(R.id.giris);
         qeydiyyat = (Button) findViewById(R.id.qeydiyyat);
-
 
         View.OnClickListener button_click = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switch (v.getId())
-                {
+                switch (v.getId()) {
                     case R.id.giris:
                         startActivity(new Intent(Main.this, Login.class)); // Login activity-sini a??r
                         break;

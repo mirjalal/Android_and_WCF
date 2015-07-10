@@ -6,7 +6,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.Calendar;
@@ -45,12 +44,12 @@ public class Profile extends ActionBarActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            name_value = extras.getString("json_name");
-            surname_value = extras.getString("json_surname");
-            graduated_from_value = extras.getString("json_graduated_from");
-            graduated_in_value = extras.getString("json_graduated_in");
-            born_place_value = extras.getString("json_born_place");
-            birthday_value = extras.getString("json_birthday");
+            name_value = extras.getString("name");
+            surname_value = extras.getString("surname");
+            graduated_from_value = extras.getString("graduated_from");
+            graduated_in_value = extras.getString("graduated_in");
+            born_place_value = extras.getString("born_place");
+            birthday_value = extras.getString("birthday");
 
             /***************** set values to view elements ******************/
             name.setText(name_value);

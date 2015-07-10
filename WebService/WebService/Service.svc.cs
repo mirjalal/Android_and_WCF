@@ -47,11 +47,11 @@ namespace WebService
 
         // https://youtu.be/iqrY9IaUY24
         // https://youtu.be/AMH4plUP0uo
-        public string register (string username, string password, string name, string surname, string graduated_from, string graduated_in, string born_place, string birthday, string profile_pic)
+        public string register (string username, string password, string name, string surname, string graduated_from, string graduated_in, string born_place, string birthday/*, string profile_pic*/)
         {
             bool result = false;
 
-            string query_insert = @"INSERT INTO users(username, password, name, surname, graduated_from, graduated_in, born_place, birthday, profile_pic) VALUES( ' " + username + " ', ' " + password + " ', ' " + name + " ', ' " + surname + " ', ' " + graduated_from + " ', ' " + graduated_in + " ', ' " + born_place + " ', ' " + birthday + " ', '" + profile_pic + " ' );";
+            string query_insert = @"INSERT INTO users(username, password, name, surname, graduated_from, graduated_in, born_place, birthday) VALUES( ' " + username + " ', ' " + password + " ', ' " + name + " ', ' " + surname + " ', ' " + graduated_from + " ', ' " + graduated_in + " ', ' " + born_place + " ', ' " + birthday + " '); "; //, '" + profile_pic + " ' );";
 
             if (connection.State == ConnectionState.Closed)
                 connection.Open();
