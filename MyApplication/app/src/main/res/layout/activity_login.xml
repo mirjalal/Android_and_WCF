@@ -8,7 +8,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="tests.com.myapplication.Login">
 
-
     <EditText
         android:id="@+id/login_username"
         android:layout_width="match_parent"
@@ -16,7 +15,9 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="118dp"
-        android:hint="@string/username" />
+        android:ems="10"
+        android:hint="@string/username"
+        android:singleLine="true" />
 
     <EditText
         android:id="@+id/login_password"
@@ -25,7 +26,9 @@
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
         android:hint="@string/password"
-        android:inputType="textPassword" />
+        android:imeOptions="actionDone"
+        android:inputType="textPassword"
+        android:singleLine="true" />
 
     <Button
         android:id="@+id/login"
@@ -38,4 +41,5 @@
         android:background="@color/material_deep_teal_500"
         android:text="@string/login"
         android:textColor="@color/white" />
+
 </RelativeLayout>

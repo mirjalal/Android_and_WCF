@@ -1,8 +1,11 @@
 package tests.com.myapplication;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,6 +40,31 @@ public class Main extends ActionBarActivity {
 
         giris.setOnClickListener(button_click);
         qeydiyyat.setOnClickListener(button_click);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
+        // Take care of calling this method on earlier versions of
+        // the platform where it doesn't exist.
+//            onBackPressed();
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onBackPressed() {
+        // This will be called either automatically for you on 2.0
+        // or later, or by the code above on earlier versions of the
+        // platform.
+        //return true;
+
+        return;
     }
 
     @Override

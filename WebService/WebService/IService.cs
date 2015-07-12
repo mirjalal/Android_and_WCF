@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
@@ -9,19 +10,19 @@ namespace WebService
     public interface IService
     {
         [OperationContract]
-        [WebGet(UriTemplate = "GetImage", RequestFormat = WebMessageFormat.Xml, ResponseFormat = WebMessageFormat.Xml, BodyStyle = WebMessageBodyStyle.Bare)]
-        System.IO.Stream GetImage();
+        [WebGet(UriTemplate = "getimage", RequestFormat = WebMessageFormat.Xml, ResponseFormat = WebMessageFormat.Xml, BodyStyle = WebMessageBodyStyle.Bare)]
+        Stream GetImage();
 
 
         [OperationContract]
-        [WebInvoke(Method = "GET", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json, UriTemplate = "/register/{username}/{password}/{name}/{surname}/{graduated_from}/{graduated_in}/{born_place}/{birthday}")]
+        [WebInvoke(Method = "POST", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json, UriTemplate = "/register/{username}/{password}/{name}/{surname}/{graduated_from}/{graduated_in}/{born_place}/{birthday}/{profile_pic}")]
         //[WebInvoke(Method = "GET", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json, UriTemplate = "register?username={username}&password={password}&name={name}&surname={surname}")]
-        string register(string username, string password, string name, string surname, string graduated_from, string graduated_in, string born_place, string birthday/*, string profile_pic*/);
+        string register(string username, string password, string name, string surname, string graduated_from, string graduated_in, string born_place, string birthday, Stream profile_pic);
 
 
         // http://stackoverflow.com/a/2089974/4057688
         [OperationContract]
-        [WebInvoke(Method = "GET", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json, UriTemplate = "login/{username}/{password}", BodyStyle=WebMessageBodyStyle.WrappedResponse)]
+        [WebInvoke(Method = "GET", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json, UriTemplate = "login/{username}/{password}", BodyStyle = WebMessageBodyStyle.WrappedResponse)]
         List<UserDetails> login(string username, string password);
     }
 
@@ -71,7 +72,7 @@ namespace WebService
         }
 
 
-        public UserDetails (string name, string surname, string graduated_from, string graduated_in, string born_place, string birthday)
+        public UserDetails(string name, string surname, string graduated_from, string graduated_in, string born_place, string birthday)
         {
             this.name = name;
             this.surname = surname;

@@ -1,15 +1,20 @@
 package tests.com.myapplication;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -56,18 +61,40 @@ public class Login extends ActionBarActivity {
         };
 
         login.setOnClickListener(clickListener);
+        password.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_GO) {
+                    login.performClick();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
 
     public class LoginAsync extends AsyncTask<String, Void, String> {
-        InputStream inputStream = null;
         String result = "";
-        String json_birthday = "";
-        String json_born_place = "";
-        String json_graduated_from = "";
-        String json_graduated_in = "";
         String json_name = "";
         String json_surname = "";
+        String json_birthday = "";
+        String json_born_place = "";
+        String json_graduated_in = "";
+        String json_graduated_from = "";
+        InputStream inputStream = null;
+        ProgressDialog progressDialog = new ProgressDialog(Login.this);
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog.setMessage("Downloading your data.\nPlease, wait...");
+            progressDialog.show();
+            progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                public void onCancel(DialogInterface arg0) {
+                    LoginAsync.this.cancel(true);
+                }
+            });
+        }
 
         @Override
         protected String doInBackground(String... params) {

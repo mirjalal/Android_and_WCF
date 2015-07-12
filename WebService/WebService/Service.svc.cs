@@ -5,7 +5,6 @@ using System.IO;
 using System.Runtime.Serialization.Json;
 using System.Collections.Generic;
 using System.ServiceModel.Web;
-using System.Text;
 
 namespace WebService
 {
@@ -37,7 +36,7 @@ namespace WebService
         //}
 
 
-        public Stream GetImage ()
+        public Stream GetImage()
         {
             FileStream fs = File.OpenRead(@"D:\a.jpg");
             WebOperationContext.Current.OutgoingResponse.ContentType = "image/jpeg";
@@ -47,7 +46,7 @@ namespace WebService
 
         // https://youtu.be/iqrY9IaUY24
         // https://youtu.be/AMH4plUP0uo
-        public string register (string username, string password, string name, string surname, string graduated_from, string graduated_in, string born_place, string birthday/*, string profile_pic*/)
+        public string register(string username, string password, string name, string surname, string graduated_from, string graduated_in, string born_place, string birthday, Stream profile_pic)
         {
             bool result = false;
 
@@ -75,7 +74,7 @@ namespace WebService
         // http://stackoverflow.com/q/29414960
         // http://stackoverflow.com/q/8270464
         // http://stackoverflow.com/q/2108297
-        public List<UserDetails> login (string username, string password)
+        public List<UserDetails> login(string username, string password)
         {
             int _id = 0;
             List<UserDetails> details = new List<UserDetails>();
@@ -108,9 +107,8 @@ namespace WebService
                     DataContractJsonSerializer serializer = new DataContractJsonSerializer(details.GetType());
                     MemoryStream memoryStream = new MemoryStream();
                     serializer.WriteObject(memoryStream, details);
-
-                    // Return the results serialized as JSON
-                    //return Encoding.UTF8.GetString(memoryStream.ToArray());
+                    memoryStream.Close();
+                    memoryStream.Dispose();
 
                     return details;
                 }

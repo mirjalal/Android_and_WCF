@@ -1,7 +1,11 @@
 package tests.com.myapplication;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -12,7 +16,6 @@ import java.util.Calendar;
 
 
 public class Profile extends ActionBarActivity {
-
     int gun, ay, il;
     Button update, clear;
     TextView profile_pic, birthday;
@@ -41,7 +44,6 @@ public class Profile extends ActionBarActivity {
         birthday = (TextView) findViewById(R.id.profile_birthday);
         /***************** get values from view elements ******************/
 
-
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             name_value = extras.getString("name");
@@ -52,12 +54,12 @@ public class Profile extends ActionBarActivity {
             birthday_value = extras.getString("birthday");
 
             /***************** set values to view elements ******************/
-            name.setText(name_value);
-            surname.setText(surname_value);
-            graduated_from.setText(graduated_from_value);
-            graduated_in.setText(graduated_in_value);
-            born_place.setText(born_place_value);
-            birthday.setText(birthday_value);
+            name.setText(name_value.trim());
+            surname.setText(surname_value.trim());
+            graduated_from.setText(graduated_from_value.trim());
+            graduated_in.setText(graduated_in_value.trim());
+            born_place.setText(born_place_value.trim());
+            birthday.setText(birthday_value.trim());
             /***************** set values to view elements ******************/
         }
 
@@ -70,9 +72,48 @@ public class Profile extends ActionBarActivity {
         /***************** set calendar to current date ******************/
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.ECLAIR
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
 
+            AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
+            alertbox.setTitle("Message");
+            alertbox.setMessage("Do you want to quit?");
 
+            alertbox.setPositiveButton("Yes",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            finish();
+                            Intent intent = new Intent(Profile.this, Main.class);
+                            startActivity(intent);
+                        }
+                    });
 
+            alertbox.setNeutralButton("No",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface arg0, int arg1) {
+                        }
+                    });
+
+            alertbox.show();
+
+            // Take care of calling this method on earlier versions of
+            // the platform where it doesn't exist.
+            onBackPressed();
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onBackPressed() {
+        // This will be called either automatically for you on 2.0
+        // or later, or by the code above on earlier versions of the
+        // platform.
+        return;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
